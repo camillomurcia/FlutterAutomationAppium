@@ -1,14 +1,16 @@
 name: Ejecucion de pruebas en iOS
 
-#on:
-#  workflow_run:
-#    workflows: ["Compilacion"]
-#    types:
-#      - completed
+on:
+  workflow_run:
+    workflows: ["Compilacion"]
+    types:
+      - completed
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      REPORT_BUCKET_NAME: "serenity-report-mobile"
     name: "Ejecucion de pruebas iOS"
     steps:
       - uses: actions/checkout@v2
@@ -16,3 +18,27 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityiOS.properties" -i
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        if: always()
+        with:
+          aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Copy Serenity Report AWS CLI
+        if: always()
+        id: serenity_report
+        env:
+          PATH: "ios"
+        run: |
+          serenity_path="serenity-$PATH-$(date +%Y.%m.%d-%H.%M.%S)"
+          mv target/site/serenity target/site/$serenity_path
+          aws s3 sync target/site/ s3://$REPORT_BUCKET_NAME/$PATH
+          echo "::set-output name=OUTPUT_PATH::$REPORT_BUCKET_NAME/$PATH/$serenity_path"
+          echo "::set-output name=SERENITY_PATH::$PATH/$serenity_path"
+
+      - name: Print S3 url
+        if: always()
+        run: echo "https://${{ env.REPORT_BUCKET_NAME }}.s3.amazonaws.com/${{ steps.serenity_report.outputs.SERENITY_PATH }}/index.html"

@@ -11,8 +11,6 @@ on:
 jobs:
   compile:
     runs-on: ubuntu-latest
-    env:
-      REPORT_BUCKET_NAME: "serenity-report-mobile"
     name: "Compilacion con Gradle"
     steps:
       - uses: actions/checkout@v2
@@ -20,27 +18,3 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew build -x test compileTestJava --info
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        if: always()
-        with:
-          aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Copy Serenity Report AWS CLI
-        if: always()
-        id: serenity_report
-        env:
-          REGRESSION_PATH_PRODUCTION: "android"
-        run: |
-          serenity_path="serenity-android-$(date +%Y.%m.%d-%H.%M.%S)"
-          mv src/test/resources target/site/$serenity_path
-          aws s3 sync target/site/ s3://$REPORT_BUCKET_NAME/$REGRESSION_PATH_PRODUCTION
-          echo "::set-output name=OUTPUT_PATH::$REPORT_BUCKET_NAME/$REGRESSION_PATH_PRODUCTION/$serenity_path"
-          echo "::set-output name=SERENITY_PATH::$REGRESSION_PATH_PRODUCTION/$serenity_path"
-
-      - name: Print S3 url
-        if: always()
-        run: echo "<https://${{ env.REPORT_BUCKET_NAME }}.s3.amazonaws.com/${{ steps.serenity_report.outputs.SERENITY_PATH }}/index.html"
