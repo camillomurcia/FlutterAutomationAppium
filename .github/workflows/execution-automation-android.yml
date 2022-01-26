@@ -31,13 +31,13 @@ jobs:
         if: always()
         id: serenity_report
         env:
-          PATH: "android"
+          REGRESSION_PATH_PRODUCTION: "android"
         run: |
-          serenity_path="serenity-$PATH-$(date +%Y.%m.%d-%H.%M.%S)"
+          serenity_path="serenity-$(date +%Y.%m.%d-%H.%M.%S)"
           mv target/site/serenity target/site/$serenity_path
-          aws s3 sync target/site/ s3://$REPORT_BUCKET_NAME/$PATH
-          echo "::set-output name=OUTPUT_PATH::$REPORT_BUCKET_NAME/$PATH/$serenity_path"
-          echo "::set-output name=SERENITY_PATH::$PATH/$serenity_path"
+          aws s3 sync target/site/ s3://$REPORT_BUCKET_NAME/$REGRESSION_PATH_PRODUCTION
+          echo "::set-output name=OUTPUT_PATH::$REPORT_BUCKET_NAME/$REGRESSION_PATH_PRODUCTION/$serenity_path"
+          echo "::set-output name=SERENITY_PATH::$REGRESSION_PATH_PRODUCTION/$serenity_path"
 
       - name: Print S3 url
         if: always()
