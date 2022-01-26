@@ -16,4 +16,3 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityAndroid.properties" -i
-        continue-on-error: true

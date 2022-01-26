@@ -1,4 +1,4 @@
-name: Ejecucion de pruebas en Android
+name: Ejecucion de pruebas en iOS
 
 on:
   workflow_run:
@@ -16,4 +16,3 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityiOS.properties" -i
-        continue-on-error: true
