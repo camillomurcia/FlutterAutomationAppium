@@ -1,4 +1,4 @@
-name: Pre-Commit E2E Tests in iOS
+name: build
 
 on:
   push:
@@ -9,53 +9,14 @@ on:
       - "master"
 
 jobs:
-  build:
-    runs-on: macOS-latest
+
+  setup-and-compile:
+    needs: setup
+    runs-on: ubuntu-latest
+    name: "configuracion y compilacion con Gradle"
     steps:
-
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-  #  - name: List iOS Devices & Platforms
-  #    run: |
-  #      xcrun simctl list
-#
-  #  - name: Install iOS 11.4 Runtime
-  #    run: |
-  #      gem install xcode-install
-  #      xcversion simulators --install='iOS 11.4'
-#
-  #  - name: Create and Run iOS Emulator - iPhoneX on iOS 11.4, Update default appium config for iOS
-  #    run: |
-  #       xcrun simctl create TestiPhoneX com.apple.CoreSimulator.SimDeviceType.iPhone-X com.apple.CoreSimulator.SimRuntime.iOS-11-4 > deviceid.txt
-  #       echo "DEVICEUUID=`cat deviceid.txt`" >> $GITHUB_ENV
-  #       xcrun simctl boot ${{ env.DEVICEUUID }} &
-
-  #  - name: Read exported variable
-  #    run: |
-  #       echo "$DEVICEUUID"
-  #       echo "${{ env.DEVICEUUID }}"
-
-    - uses: actions/checkout@v2
-    - name: Install and Run Appium Server
-      run: |
-        chmod +x ./scripts/RunAppiumServer.sh
-        ./scripts/RunAppiumServer.sh
-
-    - name: Poll for Appium Server to Start
-      run: |
-        until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:4723/wd/hub/sessions); do
-          sleep 5
-        done
-
-    - uses: futureware-tech/simulator-action@v1
-      with:
-        model: 'iPhone 8'
-
-
-    - name: Ejecucion de pruebas mobile
-      run: |
-        echo "Hello World, from ${{ env.DEVICEUUID }}"
-        chmod +x gradlew
-        ./gradlew clean test -Dappium.udid="8DAA915-C224-4249-9913-B98D0E63F8C6" -i
+      - uses: actions/checkout@v2
+      - name: Compilacion gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test compileTestJava --info
