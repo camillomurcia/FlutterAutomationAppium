@@ -17,7 +17,8 @@ jobs:
       - name: Ejecucion de pruebas Android
         run: |
           chmod +x gradlew
-          ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityAndroid.properties" -i aggregate
+ #         ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityAndroid.properties" -i aggregate
+          ./gradlew clean -i aggregate
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
