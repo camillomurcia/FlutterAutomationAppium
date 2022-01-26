@@ -1,4 +1,4 @@
-name: build
+name: Ejecucion Automatizacion
 
 on:
   push:
@@ -9,13 +9,39 @@ on:
       - "master"
 
 jobs:
-
-  setup-and-compile:
+  compile:
     runs-on: ubuntu-latest
-    name: "configuracion y compilacion con Gradle"
+    name: "Compilacion con Gradle"
     steps:
       - uses: actions/checkout@v2
       - name: Compilacion gradle
         run: |
           chmod +x gradlew
           ./gradlew build -x test compileTestJava --info
+  test:
+    needs: compile
+    runs-on: ubuntu-latest
+    name: "Ejecucion de pruebas"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Ejecucion de pruebas iOS
+        run: |
+          chmod +x gradlew
+          ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityiOS.properties"
+        continue-on-error: true
+      - name: Ejecucion de pruebas Android
+        run: |
+          chmod +x gradlew
+          ./gradlew test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityAndroid.properties"
+        continue-on-error: true
+      - name: Generar reporte
+        run: |
+          chmod +x gradlew
+          ./gradlew aggregate
+      - name: GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        if: github.ref == 'refs/heads/master'
+        with:
+          BRANCH: gh-pages
+          FOLDER: target/site/serenity
+          CLEAN: true
