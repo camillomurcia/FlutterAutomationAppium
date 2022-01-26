@@ -17,7 +17,7 @@ jobs:
       - name: Ejecucion de pruebas iOS
         run: |
           chmod +x gradlew
-          ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityiOS.properties" -i
+          ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityiOS.properties" -i aggregate
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
