@@ -8,7 +8,6 @@ on:
 
 jobs:
   test:
-    needs: compile
     runs-on: ubuntu-latest
     name: "Ejecucion de pruebas Android"
     steps:
