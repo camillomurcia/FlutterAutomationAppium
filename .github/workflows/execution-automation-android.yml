@@ -1,10 +1,10 @@
 name: Ejecucion de pruebas en Android
 
-on:
-  workflow_run:
-    workflows: ["Compilacion"]
-    types:
-      - completed
+#on:
+#  workflow_run:
+#    workflows: ["Compilacion"]
+#    types:
+#      - completed
 
 jobs:
   test:
