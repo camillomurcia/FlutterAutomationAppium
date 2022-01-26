@@ -1,0 +1,20 @@
+name: Ejecucion de pruebas en Android
+
+on:
+  workflow_run:
+    workflows: ["Compilacion"]
+    types:
+      - completed
+
+jobs:
+  test:
+    needs: compile
+    runs-on: ubuntu-latest
+    name: "Ejecucion de pruebas Android"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Ejecucion de pruebas Android
+        run: |
+          chmod +x gradlew
+          ./gradlew clean test -Dappium.hub="${{ secrets.KOBITON }}" -Dproperties="serenityAndroid.properties" -i
+        continue-on-error: true
